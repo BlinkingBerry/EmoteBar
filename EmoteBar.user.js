@@ -2,7 +2,7 @@
 // @name         Emote Bar
 // @namespace    p1
 // @run-at       document-start
-// @version      0.2
+// @version      0.3
 // @description  Creates an emote bar at the bottom of the screen while there isn't one implemented in the game yet!
 // @author       p1
 // @match        https://boxcritters.com/play/
@@ -61,10 +61,20 @@
 		overrideEmoteMenu(menuIsHorizontal);
 		let emoteMenu;
 
+		// Check for SArpnt's Big Screen mod
+		let bigScreenInstalled = false;
+		if (cardboard != undefined) {
+			if (cardboard.mods.bigScreen != undefined) {
+				// and one last check, because if Big Screen mod fails to load in time, it does create that hook in cardboard, but it's empty...
+				if (cardboard.mods.bigScreen.screenState != undefined) {
+					bigScreenInstalled = true;
+				};
+			};
+		};
+
 		function createNewEmoteMenu() {
-			// Check for SArpnt's Big Screen mod
-			if (document.getElementById('menubar') != undefined) {
-				if (document.getElementById('menubar').style.position == "absolute") {
+			if (bigScreenInstalled == true) {
+				if (cardboard.mods.bigScreen.screenState[1] == "f") {
 					// The chat bar is inside the game canvas!
 
 					if ((world.stage.getChildByName("emoteMenu") != undefined) && (menuIsHorizontal == true)) {
