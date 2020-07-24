@@ -2,7 +2,7 @@
 // @name         Emote Bar
 // @namespace    p1
 // @run-at       document-start
-// @version      0.3
+// @version      0.4
 // @description  Creates an emote bar at the bottom of the screen while there isn't one implemented in the game yet!
 // @author       p1
 // @match        https://boxcritters.com/play/
@@ -43,13 +43,7 @@
 						n.on("click",(function () {
 							world.emote(s)
 						})),
-							n.on("mouseover",(function () {
-							o.alpha = 1.0;
-						})),
-							n.on("mouseout",(function () {
-							o.alpha = 0.3;
-						})),
-							o.addChild(n)
+						o.addChild(n)
 					}
 				}))
 			}
@@ -60,6 +54,10 @@
 		let menuIsHorizontal = true;
 		overrideEmoteMenu(menuIsHorizontal);
 		let emoteMenu;
+		let startEmoteBarX = 831;
+		let startEmoteBarY = 437;
+		let emoteMenuFocusAlpha = 1;
+		let emoteMenuUnfocusAlpha = 0.3;
 
 		// Check for SArpnt's Big Screen mod
 		let bigScreenInstalled = false;
@@ -86,7 +84,7 @@
 						overrideEmoteMenu(menuIsHorizontal);
 						emoteMenu = new box.EmoteMenu();
 						world.stage.addChild(emoteMenu);
-						emoteMenu.x = 831;
+						emoteMenu.x = startEmoteBarX;
 						emoteMenu.scale = world.stage.height / (world.media.emotes.themes.length * 50 + 12);
 					};
 				} else {
@@ -99,7 +97,7 @@
 						overrideEmoteMenu(menuIsHorizontal);
 						emoteMenu = new box.EmoteMenu();
 						world.stage.addChild(emoteMenu);
-						emoteMenu.y = 437;
+						emoteMenu.y = startEmoteBarY;
 						emoteMenu.scale = world.stage.width / (world.media.emotes.themes.length * 50 + 14);
 					};
 				};
@@ -110,17 +108,93 @@
 					overrideEmoteMenu(menuIsHorizontal);*/
 					emoteMenu = new box.EmoteMenu();
 					world.stage.addChild(emoteMenu);
-					emoteMenu.y = 437;
+					emoteMenu.y = startEmoteBarY;
 					emoteMenu.scale = world.stage.width / (world.media.emotes.themes.length * 50 + 14);
 				};
 			};
 			emoteMenu.name = "emoteMenu";
-			emoteMenu.alpha = 0.3;
+			emoteMenu.alpha = emoteMenuUnfocusAlpha;
+
 		};
 
 		createNewEmoteMenu();
 
-		world.stage.enableMouseOver();
+		onmousemove = function(e){
+			if (document.elementFromPoint(e.clientX, e.clientY).id == "stage") {
+
+				let zoomFactor = 1;
+				if (safari != undefined) {
+					if (visualViewport.scale > 1) {
+						console.warn("ATTENTION! Emote Bar mouse hover recognition only works properly when not using pinch to zoom! (for now)");
+						emoteMenu.alpha = emoteMenuUnfocusAlpha;
+						return;
+					};
+				} else {
+					zoomFactor = devicePixelRatio;
+				};
+
+				let stage = document.getElementById("stage");
+
+				if (menuIsHorizontal == true) {
+					// The Emote Bar is at the bottom
+
+					let mousePosition = e.clientY;
+					let canvasSize = stage.height / zoomFactor;
+					let canvasOffset = stage.clientTop;
+					let windowSize = window.innerHeight;
+					let scrollAmount = document.documentElement.scrollTop;
+					//console.log(mousePosition, canvasSize, canvasOffset, windowSize, scrollAmount);
+
+					let canvasBeginningOnscreen = canvasOffset - scrollAmount;
+					let relativeMousePositionOnCanvas = (mousePosition - canvasBeginningOnscreen) / canvasSize;
+
+					let gameHeight = world.stage.height;
+					let mouseY = relativeMousePositionOnCanvas * gameHeight;
+					//console.log(mouseY);
+					if (mouseY > startEmoteBarY) {
+						if (emoteMenu.alpha < emoteMenuFocusAlpha) {
+							emoteMenu.alpha = emoteMenuFocusAlpha;
+						};
+					} else {
+						if (emoteMenu.alpha == emoteMenuFocusAlpha) {
+							emoteMenu.alpha = emoteMenuUnfocusAlpha;
+						};
+					};
+
+				} else {
+					// The Emote Bar is at the side
+
+					let mousePosition = e.clientX;
+					let canvasSize = stage.width / zoomFactor;
+					let canvasOffset = stage.clientLeft;
+					let windowSize = window.innerWidth;
+					let scrollAmount = document.documentElement.scrollLeft;
+
+					let canvasBeginningOnscreen = canvasOffset - scrollAmount;
+					let relativeMousePositionOnCanvas = (mousePosition - canvasBeginningOnscreen) / canvasSize;
+
+					let gameWidth = world.stage.width;
+					let mouseX = relativeMousePositionOnCanvas * gameWidth;
+
+					if (mouseX > startEmoteBarX) {
+						if (emoteMenu.alpha < emoteMenuFocusAlpha) {
+							emoteMenu.alpha = emoteMenuFocusAlpha;
+						};
+					} else {
+						if (emoteMenu.alpha == emoteMenuFocusAlpha) {
+							emoteMenu.alpha = emoteMenuUnfocusAlpha;
+						};
+					};
+				};
+			} else {
+				if (emoteMenu.alpha == emoteMenuFocusAlpha) {
+					emoteMenu.alpha = emoteMenuUnfocusAlpha;
+				};
+			};
+		};
+
+
+		//world.stage.enableMouseOver();
 
 		window.addEventListener('resize', createNewEmoteMenu);
 	}
