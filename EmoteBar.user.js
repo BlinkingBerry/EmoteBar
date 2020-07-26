@@ -124,7 +124,7 @@
 
 				if (menuIsHorizontal == true) {
 					// The Emote Bar is at the bottom
-					if (world.stage.mouseX > startEmoteBarX) {
+					if (world.stage.mouseY > startEmoteBarY) {
 						if (emoteMenu.alpha < emoteMenuFocusAlpha) {
 							emoteMenu.alpha = emoteMenuFocusAlpha;
 						};
@@ -135,7 +135,7 @@
 					};
 				} else {
 					// The Emote Bar is at the side
-					if (world.stage.mouseY > startEmoteBarY) {
+					if (world.stage.mouseX > startEmoteBarX) {
 						if (emoteMenu.alpha < emoteMenuFocusAlpha) {
 							emoteMenu.alpha = emoteMenuFocusAlpha;
 						};
