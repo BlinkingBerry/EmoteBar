@@ -2,7 +2,7 @@
 // @name         Emote Bar
 // @namespace    p1
 // @run-at       document-start
-// @version      0.4
+// @version      0.5
 // @description  Creates an emote bar at the bottom of the screen while there isn't one implemented in the game yet!
 // @author       p1
 // @match        https://boxcritters.com/play/
@@ -122,6 +122,30 @@
 		onmousemove = function(e){
 			if (document.elementFromPoint(e.clientX, e.clientY).id == "stage") {
 
+				if (menuIsHorizontal == true) {
+					// The Emote Bar is at the bottom
+					if (world.stage.mouseX > startEmoteBarX) {
+						if (emoteMenu.alpha < emoteMenuFocusAlpha) {
+							emoteMenu.alpha = emoteMenuFocusAlpha;
+						};
+					} else {
+						if (emoteMenu.alpha == emoteMenuFocusAlpha) {
+							emoteMenu.alpha = emoteMenuUnfocusAlpha;
+						};
+					};
+				} else {
+					// The Emote Bar is at the side
+					if (world.stage.mouseY > startEmoteBarY) {
+						if (emoteMenu.alpha < emoteMenuFocusAlpha) {
+							emoteMenu.alpha = emoteMenuFocusAlpha;
+						};
+					} else {
+						if (emoteMenu.alpha == emoteMenuFocusAlpha) {
+							emoteMenu.alpha = emoteMenuUnfocusAlpha;
+						};
+					};
+				};
+/*
 				let zoomFactor = 1;
 				if (safari != undefined) {
 					if (visualViewport.scale > 1) {
@@ -186,6 +210,7 @@
 						};
 					};
 				};
+*/
 			} else {
 				if (emoteMenu.alpha == emoteMenuFocusAlpha) {
 					emoteMenu.alpha = emoteMenuUnfocusAlpha;
