@@ -2,7 +2,7 @@
 // @name         Emote Bar
 // @namespace    p1
 // @run-at       document-start
-// @version      0.6
+// @version      0.7
 // @updateURL    https://github.com/p1-BCMC/EmoteBar/raw/master/EmoteBar.user.js
 // @downloadURL  https://github.com/p1-BCMC/EmoteBar/raw/master/EmoteBar.user.js
 // @description  Creates an emote bar at the bottom of the screen while there isn't one implemented in the game yet!
