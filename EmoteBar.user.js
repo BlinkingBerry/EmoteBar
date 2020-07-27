@@ -63,7 +63,7 @@
 
 		// Check for SArpnt's Big Screen mod
 		let bigScreenInstalled = false;
-		if (cardboard != undefined) {
+		if (typeof cardboard != "undefined") {
 			if (cardboard.mods.bigScreen != undefined) {
 				// and one last check, because if Big Screen mod fails to load in time, it does create that hook in cardboard, but it's empty...
 				if (cardboard.mods.bigScreen.screenState != undefined) {
