@@ -2,7 +2,7 @@
 // @name         Emote Bar
 // @namespace    p1
 // @run-at       document-start
-// @version      0.7
+// @version      0.8
 // @updateURL    https://github.com/p1-BCMC/EmoteBar/raw/master/EmoteBar.user.js
 // @downloadURL  https://github.com/p1-BCMC/EmoteBar/raw/master/EmoteBar.user.js
 // @description  Creates an emote bar at the bottom of the screen while there isn't one implemented in the game yet!
@@ -27,7 +27,46 @@
 	}, 1000/60);
 
 	function onWorldLoaded() {
+
+		let emotes = client.loadedSpriteSheets.emotes;
+		let themes = [];
+
+		emotes._animations.forEach(theme => {
+			if (theme.toLowerCase().startsWith(world.player.critterId.toLowerCase())) {
+				themes.push(theme);
+			};
+		});
+
 		function overrideEmoteMenu(horizontal) {
+
+			function t(t) {
+				//let emoteContainer = new createjs.Container;
+				createjs.Container.call(this);
+
+				for (let i=0;i<themes.length;i++) {
+					let emoteSprite = new createjs.Sprite(emotes, themes[i]);
+					if (emotes.getAnimation(themes[i])) {
+						emoteSprite.gotoAndPlay(themes[i]);
+						if (horizontal == true) {
+							emoteSprite.setTransform(50*i,0,.5,.5);
+						} else {
+							emoteSprite.setTransform(0,50*i,.5,.5);
+						};
+						//console.log(emoteSprite);
+						let rawTheme = themes[i].toLowerCase().replace(world.player.critterId.toLowerCase() + "/", "");
+						emoteSprite.on("click",(function () {
+							world.emote(rawTheme);
+						}));
+
+						//emoteContainer.addChild(emoteSprite);
+						this.addChild(emoteSprite);
+					};
+				};
+			}
+
+			t.prototype = Object.create(createjs.Container.prototype),
+				box.EmoteMenu = t
+/*
 			function t(t) {
 				createjs.Container.call(this);
 				let e=world.media.emotes.themes,
@@ -50,7 +89,7 @@
 				}))
 			}
 			t.prototype = Object.create(createjs.Container.prototype),
-				box.EmoteMenu = t
+				box.EmoteMenu = t*/
 		};
 
 		let menuIsHorizontal = true;
@@ -59,7 +98,7 @@
 		let startEmoteBarX = 831;
 		let startEmoteBarY = 437;
 		let emoteMenuFocusAlpha = 1;
-		let emoteMenuUnfocusAlpha = 0.3;
+		let emoteMenuUnfocusAlpha = 0.2;
 
 		// Check for SArpnt's Big Screen mod
 		let bigScreenInstalled = false;
@@ -87,7 +126,7 @@
 						emoteMenu = new box.EmoteMenu();
 						world.stage.addChild(emoteMenu);
 						emoteMenu.x = startEmoteBarX;
-						emoteMenu.scale = world.stage.height / (world.media.emotes.themes.length * 50 + 12);
+						emoteMenu.scale = world.stage.height / (themes.length * 50 + 12);
 					};
 				} else {
 					if ((world.stage.getChildByName("emoteMenu") != undefined) && (menuIsHorizontal == false)) {
@@ -100,7 +139,7 @@
 						emoteMenu = new box.EmoteMenu();
 						world.stage.addChild(emoteMenu);
 						emoteMenu.y = startEmoteBarY;
-						emoteMenu.scale = world.stage.width / (world.media.emotes.themes.length * 50 + 14);
+						emoteMenu.scale = world.stage.width / (themes.length * 50 + 14);
 					};
 				};
 			} else {
@@ -111,7 +150,7 @@
 					emoteMenu = new box.EmoteMenu();
 					world.stage.addChild(emoteMenu);
 					emoteMenu.y = startEmoteBarY;
-					emoteMenu.scale = world.stage.width / (world.media.emotes.themes.length * 50 + 14);
+					emoteMenu.scale = world.stage.width / (themes.length * 50 + 14);
 				};
 			};
 			emoteMenu.name = "emoteMenu";
