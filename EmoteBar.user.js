@@ -2,7 +2,7 @@
 // @name         Emote Bar
 // @namespace    p1
 // @run-at       document-start
-// @version      0.9
+// @version      0.9.1
 // @updateURL    https://github.com/p1-BCMC/EmoteBar/raw/master/EmoteBar.user.js
 // @downloadURL  https://github.com/p1-BCMC/EmoteBar/raw/master/EmoteBar.user.js
 // @description  Creates an emote bar at the bottom of the screen while there isn't one implemented in the game yet!
@@ -202,7 +202,7 @@
 
 		// General settings
 		let emoteBarOutsideAlpha = 0.1;
-		let emoteBarStartAlpha = 0.2;
+		let emoteBarStartAlpha = 0.15;
 		let emotesMinAlphaWhenSelecting = 0.5;
 		let emoteBarEnabled = true; // Whether the emoteBar is enabled on launch.
 		let startEmoteBarX = 831;
@@ -211,8 +211,8 @@
 		// ^ (above) MUST be greater than that v (below).
 		let enlargeAreaMultiplier = 0.5; // The emoteBar will start becoming bigger (under the mouse) when hovering closer than half a height above/left of it.
 		let maxEmoteSize = 1.5;
-		let maxOffsetDown = 5;
-		let maxOffsetRight = 3;
+		let maxOffsetDown = 10;
+		let maxOffsetRight = 7;
 
 		let barIsHorizontal = true;
 		let emoteBar;
@@ -276,8 +276,40 @@
 
 
 		onmousemove = function() {
-			if (emoteBarEnabled == true) {
+			if ((emoteBarEnabled == true) && (world.stage.getChildByName("emoteBar") != undefined)) {
 				// We only want the emoteBar to show when it is enabled.
+
+				// If a player pressed on "mobile" or changed the screen ratio in any other way; as soon as the mouse moves, the emoteBar is recreated in the then correct orientation.
+				if ((world.stage.width < world.stage.height) && (barIsHorizontal)) {
+					barIsHorizontal = false;
+
+					world.stage.removeChild(emoteBar);
+					emoteBar = createEmoteBar(barIsHorizontal);
+					world.stage.addChild(emoteBar);
+					emoteBar.x = startEmoteBarX;
+					emoteBar.scale = world.stage.height / (themes.length * 50 + 12);
+				} else if ((world.stage.width > world.stage.height) && (!barIsHorizontal)) {
+					if (bigScreenInstalled == true) {
+						if (cardboard.mods.bigScreen.screenState[1] != "f") {
+							barIsHorizontal = false;
+
+							world.stage.removeChild(emoteBar);
+							emoteBar = createEmoteBar(barIsHorizontal);
+							world.stage.addChild(emoteBar);
+							emoteBar.y = startEmoteBarY;
+							emoteBar.scale = world.stage.width / (themes.length * 50 + 14);
+						};
+					} else {
+						barIsHorizontal = false;
+
+						world.stage.removeChild(emoteBar);
+						emoteBar = createEmoteBar(barIsHorizontal);
+						world.stage.addChild(emoteBar);
+						emoteBar.y = startEmoteBarY;
+						emoteBar.scale = world.stage.width / (themes.length * 50 + 14);
+					};
+				};
+
 				if (world.stage.mouseInBounds == false) {
 					// As the pointer is outside the game's bounds, we will make the emoteBar almost entirely transparent.
 
@@ -291,7 +323,7 @@
 							createjs.Tween.get(emoteBar, {override: true}).to({
 								alpha: emoteBarOutsideAlpha,
 								y: startEmoteBarY + maxOffsetDown
-							}, 400, createjs.Ease.quadInOut);
+							}, 400, createjs.Ease.easeIn);
 						};
 
 						/* TODO: DRAW EMOTE BAR "NORMALLY" sized! - but only if it wasn't "normally" sized (e.g. enlarged) before! */
@@ -326,7 +358,7 @@
 							createjs.Tween.get(emoteBar, {override: true}).to({
 								alpha: emoteBarOutsideAlpha + (emoteBarStartAlpha - emoteBarOutsideAlpha) * relativePositionTransparencyArea,
 								y: startEmoteBarY + maxOffsetDown
-							}, 100, createjs.Ease.quadInOut);
+							}, 100, createjs.Ease.easeIn);
 
 							/* TODO: DRAW EMOTE BAR "NORMALLY" sized! - but only if it wasn't "normally" sized (e.g. enlarged) before! */
 
@@ -340,7 +372,7 @@
 							createjs.Tween.get(emoteBar, {override: true}).to({
 								alpha: emoteBarStartAlpha + (1.0 - emoteBarStartAlpha) * relativePositionEnlargeArea,
 								y: startEmoteBarY + (1.0 - relativePositionEnlargeArea) * maxOffsetDown
-							}, 100, createjs.Ease.quadInOut);
+							}, 100, createjs.Ease.easeIn);
 
 							/* TODO: DRAW EMOTE BAR partially enlarged! (relative amount compared to max.: "relativePositionEnlargeArea") */
 
@@ -352,7 +384,7 @@
 							createjs.Tween.get(emoteBar, {override: true}).to({
 								alpha: 1,
 								y: startEmoteBarY
-							}, 100, createjs.Ease.quadInOut);
+							}, 100, createjs.Ease.easeIn);
 
 
 							/* TODO: DRAW EMOTE BAR completely enlarged! (only those under mouse) */
@@ -440,7 +472,8 @@
 		- Enlarges emotes under mouse, like macOS dock (when magnification is enabled).
 		- Makes emotes that are further away from the mouse (when enlarged already) slightly transparent: "emotesMinAlphaWhenSelecting" (only enlarged ones have full opaqueness)
 		- Button to enable/disable emoteBar.
-		-
+		- Keyboard shortcut to enable/disable emoteBar.
+		--> Zoom to fixed width (always the same); then anchor to side that's farther away from cursor (gets shorter on the sides)
 		*/
 
 
